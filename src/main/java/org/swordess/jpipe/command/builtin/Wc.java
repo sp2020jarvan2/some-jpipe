@@ -5,15 +5,15 @@ import java.util.List;
 
 import org.swordess.jpipe.command.Command;
 import org.swordess.jpipe.command.CommandAnno;
-import org.swordess.jpipe.command.CommandAnno.Option;
-import org.swordess.jpipe.util.CollectionUtils;
+import org.swordess.jpipe.command.CommandAnno.OptionAnno;
 import org.swordess.jpipe.util.IOUtils;
 
+//TODO improve options according to Linux wc
 @CommandAnno( name = "wc", desc = "print the number of newlines, words", options = {
-	@Option(name = "-l", desc = "print the newline counts"),
-	@Option(name = "-w", desc = "print the word counts")
+	@OptionAnno(name = "-l", desc = "print the newline counts"),
+	@OptionAnno(name = "-w", desc = "print the word counts")
 })
-public final class Wc extends Command {
+public class Wc extends Command {
 
 	private int lineCount = 0;
 	private int wordCount = 0;
@@ -23,7 +23,7 @@ public final class Wc extends Command {
 		String outputFormat = null;
 		Object[] outputArgs = null;
 		
-		if (CollectionUtils.isEmpty(options)) {
+		if (!haveSupportedOptions()) {
 			countLines(lines);
 			countWords(lines);
 			outputFormat = getDefaultOutputFormat();

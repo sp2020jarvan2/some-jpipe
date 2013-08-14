@@ -11,12 +11,13 @@ public @interface CommandAnno {
 
 	public String name();
 	public String desc() default "";
-	public Option[] options() default {};
+	public OptionAnno[] options() default {};
 	
 	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface Option {
+	public static @interface OptionAnno {
 		public String name();
 		public String desc();
+		public boolean switchable() default true;
 	}
 	
 }

@@ -6,23 +6,26 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.swordess.jpipe.command.CommandAnno;
 import org.swordess.jpipe.command.Command;
-import org.swordess.jpipe.command.CommandAnno.Option;
+import org.swordess.jpipe.command.CommandAnno;
+import org.swordess.jpipe.command.CommandAnno.OptionAnno;
 import org.swordess.jpipe.util.IOUtils;
 import org.swordess.jpipe.util.StringUtils;
 
+//TODO improve options according to Linux grep
 @CommandAnno(name = "grep", desc = "print lines matching a pattern", options = {
-	@Option(name = "-n", desc = "prefix each line of output with the line number within its input"),
-	@Option(name = "-v", desc = "in verbose format")
+	@OptionAnno(name = "-n", desc = "prefix each line of output with the line number within its input"),
+	@OptionAnno(name = "-v", desc = "in verbose format")
 })
-public final class Grep extends Command {
+public class Grep extends Command {
 
 	@Override
 	protected int processLines(List<String> lines, PipedWriter writer) {
 		int lineNumberWidth = String.valueOf(lines.size()).length();
 		
-		Pattern pattern = Pattern.compile(options.get(options.size() - 1));
+		String patternStr = options.get(options.size() - 1).getValue().toString();
+		Pattern pattern = Pattern.compile(patternStr);
+		
 		List<String> matchedLines = new ArrayList<String>();
 		
 		for (int i = 0; i < lines.size(); i++) {
@@ -36,14 +39,26 @@ public final class Grep extends Command {
 			}
 			
 			if (match) {
-				String empty = StringUtils.emptyStr(line.length());
-				String cursors = StringUtils.replaceAll(empty, matchedIndexes, "^");
-				
-				if (hasOption("-n")) {
-					matchedLines.add(String.format("%" + lineNumberWidth + "d:%s", i, line));
-					matchedLines.add(String.format("%" + (lineNumberWidth + 1)+ "s%s", "", cursors));
+				if (!haveSupportedOptions()) {
+					matchedLines.add(line);
 				} else {
-					matchedLines.add(String.format("%s%n%s", line, cursors));
+					boolean hasNOption = hasOption("-n");
+					boolean hasVOption = hasOption("-v");
+					
+					if (hasVOption) {
+						String empty = StringUtils.emptyStr(line.length());
+						String cursors = StringUtils.replaceAll(empty, matchedIndexes, "^");
+						
+						if (hasNOption) {
+							matchedLines.add(String.format("%" + lineNumberWidth + "d:%s", i+1, line));
+							matchedLines.add(String.format("%" + (lineNumberWidth + 1)+ "s%s", "", cursors));
+						} else {
+							matchedLines.add(line);
+							matchedLines.add(cursors);
+						}
+					} else if (hasNOption) {
+						matchedLines.add(String.format("%" + lineNumberWidth + "d:%s", i+1, line));
+					}
 				}
 			}
 		}
