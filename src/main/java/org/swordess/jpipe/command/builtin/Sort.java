@@ -1,6 +1,7 @@
 package org.swordess.jpipe.command.builtin;
 
 import java.io.PipedWriter;
+import java.io.Reader;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +15,10 @@ import org.swordess.jpipe.util.IOUtils;
 	@OptionAnno(name = "-r", desc = "reverse the result of comparisons")
 })
 public class Sort extends Command {
+
+	public Sort(Reader[] sources) {
+		super(sources);
+	}
 
 	@Override
 	protected int processLines(List<String> lines, PipedWriter writer) {

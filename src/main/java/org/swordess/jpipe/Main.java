@@ -22,13 +22,13 @@ public class Main {
 	
 	public static void main(String[] args) {
 		if (ArrayUtils.isEmpty(args)) {
-			System.err.println("-jpipe: no command provided");
+			Debug.err("no shell provided");
 			System.exit(0);
 		}
 		
 		String shell = args[0];
-		int statusCode = new CommandExecuter(shell).start();
-		System.exit(statusCode);
+		int shellStatusCode = new CommandExecuter(shell).start();
+		System.exit(shellStatusCode);
 	}
 	
 }

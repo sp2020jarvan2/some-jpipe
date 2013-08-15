@@ -4,22 +4,27 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PipedWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.swordess.jpipe.Debug;
 import org.swordess.jpipe.command.Command;
 import org.swordess.jpipe.command.CommandAnno;
 import org.swordess.jpipe.command.CommandAnno.OptionAnno;
 import org.swordess.jpipe.util.IOUtils;
 
 
-// TODO add description
 // TODO improve options according to Linux cat
-@CommandAnno(name = "cat", options = {
-	@OptionAnno(name = "-n", desc = "...")
+@CommandAnno(name = "cat", desc="concatenate files and print on the standard output", options = {
+	@OptionAnno(name = "-n", desc = "number all output lines")
 })
 public class Cat extends Command {
 
+	public Cat(Reader... sources) {
+		super(sources);
+	}
+	
 	@Override
 	protected void prepare() {
 		for (Option option : options) {
@@ -27,7 +32,7 @@ public class Cat extends Command {
 				String fileName = option.getValue().toString();
 				File file = new File(fileName);
 				if (!file.exists()) {
-					System.err.printf("-jpipe: cat: %s: no such file%n", fileName);
+					Debug.err("cat", fileName, "no such file");
 				}
 				
 				try {

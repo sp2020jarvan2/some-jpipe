@@ -6,6 +6,7 @@ import java.io.PipedWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.swordess.jpipe.util.ArrayUtils;
 import org.swordess.jpipe.util.CollectionUtils;
@@ -13,23 +14,39 @@ import org.swordess.jpipe.util.DataStructures;
 import org.swordess.jpipe.util.IOUtils;
 import org.swordess.jpipe.util.StringUtils;
 
-public abstract class Command {
+public abstract class Command implements Callable<Integer> {
 
 	public static final int STATUS_SUCCESS = 0;
 	public static final int STATUS_GENERAL_ERROR = 1;
 	
 	private List<Reader> sources = new ArrayList<Reader>();
 	private PipedReader reader;
+	private PipedWriter writer;
 	
 	protected List<Option> options = DataStructures.newArrayList();
 	private List<Option> supportedOptions = null;
 	
-	protected void prepare() {
+	public Command(Reader[] sources) {
+		if (ArrayUtils.isNotEmpty(sources)) {
+			for (Reader source : sources) {
+				source(source);
+			}
+		}
+		reader = new PipedReader();
+		try {
+			writer = new PipedWriter(reader);
+		} catch (IOException e) {
+		}
 	}
-
+	
 	protected abstract int processLines(List<String> lines, PipedWriter writer);
 	
-	public int run() {
+	@Override
+	public Integer call() {
+		if (null == writer) {
+			return Command.STATUS_GENERAL_ERROR;
+		}
+		
 		prepare();
 		
 		try {
@@ -38,8 +55,6 @@ public abstract class Command {
 				lines.addAll(IOUtils.readLines(source));
 			}
 			
- 			reader = new PipedReader();
-			PipedWriter writer = new PipedWriter(reader);
 			int statusCode = processLines(lines, writer);
 			writer.close(); // make sure the writer has been closed
 			
@@ -49,8 +64,11 @@ public abstract class Command {
 			return Command.STATUS_GENERAL_ERROR;
 		}
 	}
+
+	protected void prepare() {
+	}
 	
-	public Command source(Reader source) {
+	protected final Command source(Reader source) {
 		if (null != source) {
 			sources.add(source);
 		}
@@ -79,13 +97,6 @@ public abstract class Command {
 		}
 		return this;
 	}
-
-	/*
-	public List<Option> getOptions() {
-		// only return a copy in case the client impacts this command
-		return new ArrayList<Option>(options);
-	}
-	*/
 	
 	public boolean hasOption(String optionName) {
 		if (StringUtils.isEmpty(optionName)) {

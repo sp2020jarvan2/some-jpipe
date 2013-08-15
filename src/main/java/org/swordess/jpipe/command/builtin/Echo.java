@@ -1,6 +1,7 @@
 package org.swordess.jpipe.command.builtin;
 
 import java.io.PipedWriter;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
@@ -13,6 +14,10 @@ import org.swordess.jpipe.util.IOUtils;
 @CommandAnno(name = "echo", desc = "display line of text")
 public class Echo extends Command {
 	
+	public Echo(Reader[] sources) {
+		super(sources);
+	}
+
 	@Override
 	protected void prepare() {
 		StringBuilder text = new StringBuilder();

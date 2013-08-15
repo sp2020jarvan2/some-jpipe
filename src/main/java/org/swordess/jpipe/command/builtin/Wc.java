@@ -1,6 +1,7 @@
 package org.swordess.jpipe.command.builtin;
 
 import java.io.PipedWriter;
+import java.io.Reader;
 import java.util.List;
 
 import org.swordess.jpipe.command.Command;
@@ -14,6 +15,10 @@ import org.swordess.jpipe.util.IOUtils;
 	@OptionAnno(name = "-w", desc = "print the word counts")
 })
 public class Wc extends Command {
+
+	public Wc(Reader[] sources) {
+		super(sources);
+	}
 
 	private int lineCount = 0;
 	private int wordCount = 0;

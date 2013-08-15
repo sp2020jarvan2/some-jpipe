@@ -1,6 +1,7 @@
 package org.swordess.jpipe.command.builtin;
 
 import java.io.PipedWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,9 +16,13 @@ import org.swordess.jpipe.util.StringUtils;
 //TODO improve options according to Linux grep
 @CommandAnno(name = "grep", desc = "print lines matching a pattern", options = {
 	@OptionAnno(name = "-n", desc = "prefix each line of output with the line number within its input"),
-	@OptionAnno(name = "-v", desc = "in verbose format")
+	@OptionAnno(name = "-v", desc = "output in verbose format")
 })
 public class Grep extends Command {
+
+	public Grep(Reader[] sources) {
+		super(sources);
+	}
 
 	@Override
 	protected int processLines(List<String> lines, PipedWriter writer) {
