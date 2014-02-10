@@ -1,5 +1,5 @@
-jpipe
-=====
+swordess-jpipe
+==============
 
 A command line tool which supports [pipeline](http://en.wikipedia.org/wiki/Pipeline) feature like in Linux.
 
